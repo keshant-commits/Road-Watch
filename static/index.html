@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadWatch | Citizen Portal</title>
+
+    <!-- Tailwind CSS via CDN — no npm needed -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Leaflet CSS — must load before Leaflet JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Our custom styles -->
+    <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Lucide icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Font Awesome (for the red location pin icon in map.js) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        /* Full-height map behind everything */
+        #map { height: calc(100vh - 64px); width: 100%; z-index: 1 !important; }
+
+        /* All floating UI elements must be above the map (z-index > 1) */
+        .top-layer { z-index: 9999 !important; }
+
+        /* Custom red Font Awesome location pin icon */
+        .fa-location-marker {
+            color: #ef4444;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 overflow-hidden">
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="h-16 bg-slate-900 text-white flex items-center justify-between px-6 shadow-lg relative" style="z-index: 1000;">
+        <div class="flex items-center gap-2">
+            <i data-lucide="map-pin" class="text-teal-400"></i>
+            <span class="text-xl font-bold tracking-tight">Road<span class="text-teal-400">Watch</span></span>
+        </div>
+        <div class="flex items-center gap-4">
+            <!-- FIX: Use /admin route instead of admin.html so FastAPI serves it correctly -->
+            <a href="/admin" class="text-xs bg-slate-700 px-3 py-1 rounded transition hover:bg-slate-600">
+                Admin Login
+            </a>
+            <!-- Connection status badge — updated live by storage.js -->
+            <div id="connection-status" class="flex items-center gap-1 text-xs text-green-400">
+                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> Online
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== LEAFLET MAP ===== -->
+    <div id="map"></div>
+
+    <!-- ===== REPORT FAB (floating action button, bottom-left) ===== -->
+    <button id="toggle-report-btn"
+        class="top-layer fixed bottom-6 left-6 bg-teal-600 text-white w-16 h-16 rounded-full
+               shadow-2xl flex items-center justify-center hover:bg-teal-700 transition-all
+               transform active:scale-90 border-4 border-white">
+        <i data-lucide="plus" class="w-8 h-8"></i>
+    </button>
+
+    <!-- ===== DRAGGABLE REPORT CARD ===== -->
+    <div id="report-card"
+        class="top-layer fixed bottom-6 left-6 w-full max-w-md px-4 z-[9999] hidden transition-all duration-300">
+
+        <div class="glass-morphism p-6 rounded-2xl shadow-2xl border-t-4 border-teal-600 relative">
+
+            <!-- Drag handle — grab here to move the card around -->
+            <div id="drag-handle"
+                class="absolute top-0 left-0 right-0 h-4 cursor-move bg-teal-600/10 rounded-t-2xl
+                       flex justify-center items-start">
+                <div class="w-8 h-1 bg-slate-300 rounded-full mt-1"></div>
+            </div>
+
+            <!-- Close button -->
+            <button id="close-form-btn"
+                class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <div class="flex items-center gap-2 mb-4 pt-2">
+                <i data-lucide="alert-triangle" class="text-amber-500"></i>
+                <h2 class="text-lg font-semibold text-slate-800">Report Road Issue</h2>
+            </div>
+
+            <!-- ===== COMPLAINT FORM ===== -->
+            <form id="complaint-form" class="space-y-4">
+
+                <!-- Hidden GPS fields — filled by app.js from navigator.geolocation -->
+                <input type="hidden" id="lat" name="lat">
+                <input type="hidden" id="lng" name="lng">
+
+                <!-- Location status row -->
+                <div class="flex items-center justify-between text-sm mb-2">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="locate-fixed" class="w-4 h-4 text-teal-600"></i>
+                        <!-- Updated by app.js once GPS resolves -->
+                        <span id="location-text" class="text-slate-500 italic">Fetching location...</span>
+                    </div>
+                    <!-- Clicking this puts the map in "tap to pin" mode -->
+                    <button type="button" id="toggle-marking-btn"
+                        class="text-teal-600 hover:text-teal-800 font-bold flex items-center gap-1 transition-colors text-xs">
+                        📍 Adjust Location
+                    </button>
+                </div>
+
+                <!-- Issue description -->
+                <textarea id="description" name="description" rows="2"
+                    class="w-full p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-teal-500
+                           outline-none text-sm transition resize-none"
+                    placeholder="Describe the issue (e.g. large pothole, broken divider)..."></textarea>
+
+                <!-- ===== LIVE CAMERA CAPTURE AREA ===== -->
+                <div class="space-y-3">
+                    <div class="relative w-full h-64 bg-slate-200 rounded-lg overflow-hidden border-2 border-slate-300 shadow-inner">
+
+                        <!-- Placeholder shown before camera is opened -->
+                        <div id="camera-overlay"
+                            class="absolute inset-0 z-20 bg-slate-100 flex flex-col items-center
+                                   justify-center gap-3 cursor-pointer hover:bg-slate-200 transition-colors">
+                            <div class="w-16 h-16 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center shadow-sm">
+                                <i data-lucide="camera" class="w-8 h-8"></i>
+                            </div>
+                            <span class="text-sm font-semibold text-slate-600">Tap to Open Camera</span>
+                            <span class="text-xs text-slate-400">Live photo required — no gallery uploads</span>
+                        </div>
+
+                        <!-- Live camera video stream (hidden until startCamera() runs) -->
+                        <video id="camera-stream"
+                            class="hidden w-full h-full object-cover z-10"
+                            autoplay playsinline></video>
+
+                        <!-- Captured photo preview (hidden until capture button is clicked) -->
+                        <img id="photo-preview" class="hidden w-full h-full object-cover z-10" alt="Captured photo" />
+
+                        <!-- Camera control buttons (shown while camera is live) -->
+                        <div id="camera-controls"
+                            class="hidden absolute bottom-4 left-0 right-0 z-30 flex justify-center items-center gap-6">
+                            <!-- Close camera -->
+                            <button type="button" id="close-camera-btn"
+                                class="bg-slate-800 text-white p-3 rounded-full shadow-xl hover:bg-red-600
+                                       transition-colors active:scale-90">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
+                            <!-- Capture photo -->
+                            <button type="button" id="capture-btn"
+                                class="bg-white text-slate-900 p-4 rounded-full shadow-xl active:scale-90
+                                       transition-transform border-4 border-teal-500">
+                                <i data-lucide="camera" class="w-6 h-6"></i>
+                            </button>
+                            <!-- Retake (hidden until after first capture) -->
+                            <button type="button" id="retake-btn"
+                                class="hidden bg-slate-800 text-white p-4 rounded-full shadow-xl
+                                       active:scale-90 transition-transform">
+                                <i data-lucide="refresh-ccw" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hidden canvas used to snapshot the video frame -->
+                    <canvas id="capture-canvas" class="hidden"></canvas>
+                </div>
+
+                <!-- Submit button -->
+                <button type="submit"
+                    class="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-slate-400 text-white px-6 py-3
+                           rounded-lg font-bold transition-all transform active:scale-95 shadow-lg shadow-teal-200">
+                    Submit Authentic Report
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== AI CHATBOT WIDGET ===== -->
+    <div class="top-layer fixed bottom-6 right-6 z-[9999]">
+        <!-- Toggle button -->
+        <button id="chat-toggle"
+            class="w-14 h-14 bg-slate-900 text-white rounded-full shadow-2xl flex items-center
+                   justify-center hover:scale-110 transition-transform">
+            <i data-lucide="message-square" class="w-6 h-6"></i>
+        </button>
+
+        <!-- Chat window (hidden by default) -->
+        <div id="chat-window"
+            class="chat-window hidden absolute bottom-20 right-0 w-80 bg-white rounded-2xl
+                   shadow-2xl border border-slate-200 flex-col overflow-hidden">
+            <div class="bg-slate-900 text-white p-4 flex items-center gap-2">
+                <i data-lucide="bot" class="text-teal-400"></i>
+                <span class="font-medium">RoadWatch AI</span>
+            </div>
+            <!-- Message history -->
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm max-h-64"></div>
+            <!-- Input row -->
+            <div class="p-3 border-t flex gap-2">
+                <input type="text" id="chat-input"
+                    class="flex-1 p-2 text-sm border rounded-md outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="Ask about a road...">
+                <button id="send-chat"
+                    class="bg-teal-600 text-white p-2 rounded-md hover:bg-teal-700 transition-colors">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS (order matters!) ===== -->
+    <!-- 1. Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- 2. Offline storage helper -->
+    <script src="/static/storage.js"></script>
+    <!-- 3. Map logic (defines MapManager) -->
+    <script src="/static/map.js"></script>
+    <!-- 4. Main app logic (uses MapManager + Storage) -->
+    <script src="/static/app.js"></script>
+    <!-- 5. Render Lucide icons after DOM is ready -->
+    <script>
+        if (window.lucide) lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+/* ============================================
+   style.css — RoadWatch Custom Styles
+   Tailwind handles most styling.
+   This file only has things Tailwind can't do.
+   ============================================ */
+
+/* --- MAP SIZING --- */
+/* Citizen page: full height minus the 64px navbar */
+#map {
+    height: calc(100vh - 64px);
+    width: 100%;
+    z-index: 1;
+}
+
+/* Admin page: fixed height block inside the dashboard card */
+#admin-map {
+    height: 500px;
+    width: 100%;
+    z-index: 1;
+}
+
+/* --- GLASS MORPHISM --- */
+/* Frosted-glass effect for the floating report card */
+.glass-morphism {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); /* Safari support */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* --- CHATBOT WINDOW --- */
+/* Hidden by default. app.js toggles between hidden and flex. */
+.chat-window {
+    height: 420px;
+    display: none; /* Overridden to "flex" by JS when opened */
+}
+
+/* --- CUSTOM SCROLLBAR --- */
+/* Applied to the budget log sidebar in admin.html */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 10px;
+}
+
+/* --- FADE-IN ANIMATION --- */
+/* Applied to newly added map popups and alerts */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- LEAFLET POPUP OVERRIDE --- */
+/* Make Leaflet popups look slightly more modern */
+.leaflet-popup-content-wrapper {
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.leaflet-popup-content {
+    margin: 0 !important;
+    width: auto !important;
+}

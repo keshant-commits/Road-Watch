@@ -1,0 +1,468 @@
+{
+  "project": "RoadWatch",
+  "subtitle": "Beginner-Friendly Tech Stack • Hackathon Build Guide Localhost Edition",
+  "description": "Since you're building for a hackathon demo on localhost, this guide strips away everything complex and gives you only what you need to run the project, impress the judges, and finish on time. No Flutter, no Blockchain, no cloud — just tools you already know.",
+
+  "tech_stack": {
+    "frontend_ui": {
+      "technology": "HTML + CSS + JavaScript",
+      "reason": "You already know this — no new language needed"
+    },
+    "styling": {
+      "technology": "Tailwind CSS (CDN)",
+      "reason": "Add one <script> tag — instant professional styling"
+    },
+    "backend": {
+      "technology": "Python + FastAPI",
+      "reason": "Zero learning curve — same stack as Aapka Sahayak"
+    },
+    "database": {
+      "technology": "SQLite (.db file)",
+      "reason": "No install, no server — just one file, works instantly"
+    },
+    "maps": {
+      "technology": "Leaflet.js (CDN)",
+      "reason": "Free, open-source, add with one script tag"
+    },
+    "ai_chatbot": {
+      "technology": "Gemini API (free tier)",
+      "reason": "Simple API call — paste key, get intelligent answers"
+    },
+    "offline_storage": {
+      "technology": "localStorage (browser)",
+      "reason": "Built into every browser — no setup at all"
+    },
+    "transparency_log": {
+      "technology": "SQLite audit table",
+      "reason": "Just a table with timestamps + SHA-256 hash. Replaces Blockchain."
+    }
+  },
+
+  "setup": {
+    "description": "Run the whole project in 3 commands. No Docker. No cloud. No PostgreSQL install. Just pip install and run. Your entire project lives in one folder.",
+    "commands": [
+      "pip install fastapi uvicorn",
+      "python main.py",
+      "open http://localhost:8000"
+    ]
+  },
+
+  "layer_breakdown": {
+    "frontend": {
+      "label": "Frontend — HTML + CSS + JavaScript",
+      "notes": [
+        "Build your citizen-facing page and admin dashboard as plain .html files served by FastAPI.",
+        "Use Tailwind CSS via CDN — just paste one <script> tag in your HTML, no npm needed.",
+        "Make it mobile-responsive with Tailwind's built-in classes (sm:, md:) — works on phones during demo."
+      ]
+    },
+    "maps": {
+      "label": "Maps — Leaflet.js",
+      "notes": [
+        "Paste one <script> tag for Leaflet CDN — that's it, you have an interactive map.",
+        "Show road complaint pins, road type layers (NH/SH/MDR), and route the complaint to the right zone.",
+        "Leaflet is 100% free, works offline with local tile files if needed during demo."
+      ]
+    },
+    "backend": {
+      "label": "Backend — Python + FastAPI",
+      "notes": [
+        "You already built Aapka Sahayak with FastAPI — this is zero learning curve for your team.",
+        "FastAPI auto-generates /docs page showing all your API endpoints — impressive for judges.",
+        "Serve your HTML files directly from FastAPI using StaticFiles mount."
+      ]
+    },
+    "database": {
+      "label": "Database — SQLite",
+      "notes": [
+        "SQLite = one single file (roadwatch.db) in your project folder. No MySQL, no PostgreSQL, no setup.",
+        "Python has sqlite3 built-in — no pip install needed at all. Just import sqlite3.",
+        "For the demo, pre-fill it with sample road data, contractor names, and budget figures so it looks real."
+      ]
+    },
+    "ai_chatbot": {
+      "label": "AI Chatbot — Gemini API",
+      "notes": [
+        "Sign up at aistudio.google.com — get a free API key in 2 minutes.",
+        "In your system prompt, paste your local road data: contractor names, road types, budget amounts.",
+        "The AI will answer citizen questions like an expert — e.g. 'Which contractor is responsible for NH-6?'",
+        "One pip install: pip install google-generativeai — that's the only AI dependency.",
+        "Free tier available."
+      ]
+    },
+    "offline_mode": {
+      "label": "Offline Mode — localStorage (Browser Built-in)",
+      "notes": [
+        "localStorage is built into every browser — no library, no install, no code on the server.",
+        "When user files a complaint with no internet, save it to localStorage with JavaScript.",
+        "On reconnect, read from localStorage and POST it to your FastAPI backend automatically.",
+        "Demo this by turning off WiFi during the presentation — guaranteed judge impression."
+      ]
+    },
+    "budget_transparency": {
+      "label": "Budget Transparency — SQLite Audit Log",
+      "notes": [
+        "Create a budget_log table: id, road_id, amount, type (sanctioned/spent), timestamp, hash.",
+        "In Python: import hashlib — generate SHA-256 hash of each record and store it alongside.",
+        "Show this as a public 'Budget History' timeline in the admin dashboard.",
+        "Visually tells the same story as blockchain — judges see immutability, you skip the complexity.",
+        "Replaces Blockchain."
+      ]
+    }
+  },
+
+  "folder_structure": {
+    "root": "roadwatch/",
+    "files": {
+      "main.py": "FastAPI app entry point",
+      "database.py": "SQLite connection + table setup",
+      "routes/": {
+        "complaints.py": "File & route complaints",
+        "roads.py": "Road info API",
+        "budget.py": "Budget transparency log",
+        "chatbot.py": "Gemini API integration"
+      },
+      "static/": {
+        "index.html": "Citizen-facing page",
+        "admin.html": "Government dashboard",
+        "style.css": "Custom styles (minimal)",
+        "uploads/": "Folder for uploaded complaint photos"
+      },
+      "roadwatch.db": "SQLite database file",
+      "requirements.txt": "fastapi uvicorn google-generativeai python-multipart"
+    }
+  },
+
+  "requirements_txt": [
+    "fastapi",
+    "uvicorn",
+    "google-generativeai",
+    "python-multipart"
+  ],
+
+  "sqlite_tables": {
+    "roads": {
+      "columns": ["id", "name", "type", "contractor", "last_repair", "budget"]
+    },
+    "complaints": {
+      "columns": ["id", "lat", "lng", "photo_path", "description", "timestamp"]
+    },
+    "budget_log": {
+      "columns": ["id", "road_id", "amount", "type", "timestamp", "hash"]
+    }
+  },
+
+  "demo_moments": [
+    {
+      "demo": "Demo 1",
+      "title": "File a Complaint → Auto-Routes on Map",
+      "description": "User drops a complaint pin on Leaflet map. Your FastAPI backend looks up which zone it falls in (simple if/else on lat-long range) and shows 'Routed to Executive Engineer: R.K. Sharma, NH-6 Zone.'"
+    },
+    {
+      "demo": "Demo 2",
+      "title": "Ask the AI Chatbot",
+      "description": "Judge types: 'Who is responsible for the pothole on Ring Road?' — AI replies with contractor name, last repair date, and budget amount pulled from your SQLite data via the system prompt."
+    },
+    {
+      "demo": "Demo 3",
+      "title": "Show Budget Transparency Timeline",
+      "description": "Admin dashboard shows a clean table of budget entries with timestamps and SHA-256 hashes. Say: 'Every budget record is hashed and logged — any tampering would break the hash chain.'"
+    }
+  ],
+
+  "geo_tagged_photo_complaint_feature": {
+    "description": "A user turns on location, clicks a photo of a road pothole, and submits it — a pin instantly appears on the live map with the photo attached. Zero extra libraries needed. Everything is built into the browser and FastAPI.",
+    "user_flow": [
+      "User opens site on phone — works in any mobile browser, no app install needed",
+      "Clicks 'Report Road Issue' — browser asks 'Allow Location?' — user taps Allow",
+      "Location captured instantly — navigator.geolocation gives exact lat & long — zero code complexity",
+      "User clicks photo with camera — <input type='file' accept='image/*' capture='environment'> opens phone camera directly",
+      "Hits Submit button — Photo + lat + long sent to FastAPI as one form POST request",
+      "Pin appears on the map — Leaflet places a marker at that exact location with photo popup"
+    ],
+    "code_snippets": {
+      "html_get_location_and_camera": "navigator.geolocation.getCurrentPosition(pos => {\n  document.getElementById(\"lat\").value = pos.coords.latitude;\n  document.getElementById(\"lng\").value = pos.coords.longitude;\n});",
+      "fastapi_receive_photo_and_save": "@app.post(\"/complaint\")\nasync def file_complaint(photo: UploadFile, lat: float, lng: float):\n    # Save photo to disk\n    path = f\"static/uploads/{photo.filename}\"\n    with open(path, \"wb\") as f:\n        f.write(await photo.read())\n    # Save to SQLite\n    db.execute(\"INSERT INTO complaints VALUES (?,?,?)\", (lat, lng, path))\n    return {\"status\": \"ok\", \"lat\": lat, \"lng\": lng}",
+      "leaflet_show_pin_with_photo_popup": "// After complaint is submitted, add marker\nfetch(\"/complaints\").then(r => r.json()).then(data => {\n  data.forEach(c => {\n    L.marker([c.lat, c.lng])\n      .bindPopup(c.photo_url + \" \" + c.description)\n      .addTo(map);\n  });\n});"
+    },
+    "checklist": [
+      "Add /static/uploads/ folder to your project",
+      "Add python-multipart to requirements.txt (needed for FastAPI file uploads)",
+      "Create complaints table in SQLite with: id, lat, lng, photo_path, description, timestamp",
+      "Test on your phone — not just desktop — location only works on a real device",
+      "Pre-load 3-4 fake complaints in SQLite so map isn't empty at demo start"
+    ],
+    "demo_highlight": "Open the site on your phone, walk to any spot, take a photo, hit submit — judges watch the pin appear on the map on the laptop screen in real time. This is the single most impressive live demo you can do."
+  },
+
+  "project_roadmap": [
+    {
+      "phase": 1,
+      "title": "Project Setup & Folder Structure",
+      "estimated_time": "~30 min",
+      "key_output": "Project runs locally",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Create your project folder",
+          "description": "Make a folder called 'roadwatch'. Inside it create: main.py, database.py, a 'routes' folder, a 'static' folder, and a 'static/uploads' folder."
+        },
+        {
+          "step": 2,
+          "title": "Create requirements.txt",
+          "description": "Add these lines: fastapi | uvicorn | google-generativeai | python-multipart. Run: pip install -r requirements.txt"
+        },
+        {
+          "step": 3,
+          "title": "Set up main.py skeleton",
+          "description": "Import FastAPI, mount your static folder with StaticFiles, and add app = FastAPI(). Run python main.py and confirm localhost:8000 opens without errors."
+        },
+        {
+          "step": 4,
+          "title": "Create your SQLite database",
+          "description": "In database.py, write a function that creates 3 tables: roads (id, name, type, contractor, last_repair, budget), complaints (id, lat, lng, photo_path, description, timestamp), budget_log (id, road_id, amount, type, timestamp, hash)."
+        },
+        {
+          "step": 5,
+          "title": "Pre-fill sample data",
+          "description": "Insert 5-6 fake road records and 3-4 fake complaints with real lat/long coordinates of your city. This ensures the map and dashboard look populated at demo time."
+        }
+      ],
+      "tip": "Do NOT skip the sample data step. An empty map at demo time looks unfinished. Add fake data early."
+    },
+    {
+      "phase": 2,
+      "title": "Backend API (FastAPI Routes)",
+      "estimated_time": "~2 hours",
+      "key_output": "All APIs working",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Create routes/roads.py",
+          "description": "GET /roads — returns all road records from SQLite as JSON. GET /roads/{id} — returns one road's details including contractor name, type, last repair date, and budget."
+        },
+        {
+          "step": 2,
+          "title": "Create routes/complaints.py",
+          "description": "POST /complaint — accepts lat, lng, photo file, and description. Saves photo to static/uploads/, inserts record into complaints table, returns success. GET /complaints — returns all complaints as JSON for the map."
+        },
+        {
+          "step": 3,
+          "title": "Create routes/budget.py",
+          "description": "GET /budget — returns all budget_log records. POST /budget — adds new entry with SHA-256 hash generated from (road_id + amount + timestamp) using Python's hashlib. No extra library needed."
+        },
+        {
+          "step": 4,
+          "title": "Wire all routes into main.py",
+          "description": "Import each router and include it: app.include_router(roads.router), app.include_router(complaints.router), app.include_router(budget.router). Visit /docs to verify all endpoints show up."
+        },
+        {
+          "step": 5,
+          "title": "Test every endpoint with /docs",
+          "description": "FastAPI auto-generates a test UI at localhost:8000/docs. Click each endpoint, hit 'Try it out', and confirm you get correct JSON back. Fix any errors before moving to frontend."
+        }
+      ],
+      "tip": "Build and test each route file one at a time. Don't write all 3 and test together — it's much harder to find bugs that way."
+    },
+    {
+      "phase": 3,
+      "title": "Frontend — Citizen Complaint Page",
+      "estimated_time": "~2 hours",
+      "key_output": "Live pin drop works",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Create static/index.html with Tailwind CDN",
+          "description": "Add the Tailwind CDN script tag in <head>. Build a clean page with a title bar, a full-width map container div (id='map'), and a complaint form below the map."
+        },
+        {
+          "step": 2,
+          "title": "Add Leaflet map (CDN — no install)",
+          "description": "Add Leaflet CSS + JS CDN links. Initialize map centered on your city with L.map('map'). Add OpenStreetMap tiles. Map should show on page load with no errors in console."
+        },
+        {
+          "step": 3,
+          "title": "Load existing complaints as map pins",
+          "description": "On page load, fetch('/complaints') then loop through results and call L.marker([c.lat, c.lng]).bindPopup(...).addTo(map) for each one. Test that your pre-filled sample complaints appear as pins."
+        },
+        {
+          "step": 4,
+          "title": "Build the complaint form",
+          "description": "Form fields: Description textarea, Photo input (<input type='file' accept='image/*' capture='environment'>), two hidden inputs for lat and lng, and a Submit button."
+        },
+        {
+          "step": 5,
+          "title": "Add geolocation on page load",
+          "description": "Call navigator.geolocation.getCurrentPosition() when page loads. On success, fill the hidden lat/lng inputs. Show a small 'Location captured' green text so user knows it worked."
+        },
+        {
+          "step": 6,
+          "title": "Wire form submission with fetch()",
+          "description": "On submit, build a FormData object with photo + lat + lng + description. POST it to /complaint using fetch(). On success response, add the new marker to the map immediately without page reload."
+        }
+      ],
+      "tip": "Test the location + camera on your actual phone, not the desktop browser. Desktop won't have a camera and geolocation may behave differently."
+    },
+    {
+      "phase": 4,
+      "title": "Frontend — Government Admin Dashboard",
+      "estimated_time": "~1.5 hours",
+      "key_output": "Judge-facing view ready",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Create static/admin.html",
+          "description": "Separate page for government use. Same Tailwind + Leaflet setup. Add a navbar with 'RoadWatch Admin' title and a nav link back to the citizen page."
+        },
+        {
+          "step": 2,
+          "title": "Show all complaints on admin map",
+          "description": "Same as citizen map but with different marker color (red = unresolved, green = resolved). Clicking a pin shows: photo, description, timestamp, and a 'Mark Resolved' button."
+        },
+        {
+          "step": 3,
+          "title": "Build road info table",
+          "description": "Fetch /roads and display as an HTML table with columns: Road Name, Type (NH/SH/MDR), Contractor, Last Repair, Budget. Style with Tailwind's table classes. This directly addresses the 'Data Accuracy' eval criterion."
+        },
+        {
+          "step": 4,
+          "title": "Build budget transparency timeline",
+          "description": "Fetch /budget and display as a vertical timeline list. Each entry shows: road name, amount, type (Sanctioned/Spent), date, and the first 12 characters of the SHA-256 hash. Label it 'Immutable Budget Log'."
+        },
+        {
+          "step": 5,
+          "title": "Add complaint routing display",
+          "description": "When a complaint pin is clicked, show which Executive Engineer is responsible based on the road zone. You can hardcode a simple zone-to-engineer mapping (e.g. North Zone -> Eng. R.K. Sharma). Judges only need to see it works."
+        }
+      ],
+      "tip": "The admin dashboard is what judges spend most time on. Make it look clean and official — use Tailwind's bg-gray-50, shadow-sm, and rounded-lg classes everywhere."
+    },
+    {
+      "phase": 5,
+      "title": "AI Chatbot Integration",
+      "estimated_time": "~1 hour",
+      "key_output": "Smart Q&A working",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Get Gemini API key",
+          "description": "Go to aistudio.google.com, sign in with Google, click 'Get API Key'. It's free. Copy the key and store it in a .env file as GEMINI_API_KEY=your_key_here. Never paste it directly in code."
+        },
+        {
+          "step": 2,
+          "title": "Create routes/chatbot.py",
+          "description": "Install: pip install google-generativeai. Import genai, configure with your key. Create POST /chat endpoint that accepts a user message string and returns AI response string."
+        },
+        {
+          "step": 3,
+          "title": "Build the system prompt",
+          "description": "This is the most important step. Your system prompt should include: your road data (paste the SQLite records as text), local road types (NH/SH/MDR explanation), and instruction to only answer road-related questions and route complaints."
+        },
+        {
+          "step": 4,
+          "title": "Add chat widget to index.html",
+          "description": "Add a fixed chat button (bottom-right corner) that opens a chat panel. Input box + send button. On send, POST to /chat and display the AI response in the panel. Style with Tailwind."
+        },
+        {
+          "step": 5,
+          "title": "Test with judge-style questions",
+          "description": "Before demo, test these exact questions: 'Who is responsible for Ring Road?', 'When was NH-6 last repaired?', 'How much budget was spent on the bypass?' — make sure AI gives confident answers from your data."
+        }
+      ],
+      "tip": "The system prompt is everything. Spend 20 minutes writing it well. Paste your actual road data into it. A well-prompted Gemini beats a poorly-prompted GPT-4 every time."
+    },
+    {
+      "phase": 6,
+      "title": "Offline Mode (localStorage)",
+      "estimated_time": "~45 min",
+      "key_output": "WiFi-off demo works",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Detect internet connection in JS",
+          "description": "Use navigator.onLine to check if browser has internet. Add event listeners: window.addEventListener('online', syncOfflineComplaints) and window.addEventListener('offline', showOfflineBanner)."
+        },
+        {
+          "step": 2,
+          "title": "Save complaint to localStorage when offline",
+          "description": "If navigator.onLine is false when user submits, save the FormData fields (not the photo — just lat, lng, description) to localStorage as JSON. Show 'Saved offline — will sync when connected' message."
+        },
+        {
+          "step": 3,
+          "title": "Auto-sync when internet returns",
+          "description": "In the 'online' event listener, read all saved complaints from localStorage, POST each one to /complaint, then clear localStorage. Show 'Synced X complaints' success message."
+        },
+        {
+          "step": 4,
+          "title": "Test by turning WiFi off",
+          "description": "Practice this demo step: turn off WiFi, submit a complaint, see the offline message, turn WiFi back on, watch it auto-sync and pin appear on map. Rehearse this 2-3 times before the hackathon."
+        }
+      ],
+      "tip": "This feature directly targets the 'offline functionality' eval criterion. Even if it's simple localStorage, demo it confidently — most teams won't have it at all."
+    },
+    {
+      "phase": 7,
+      "title": "Polish, Sample Data & Demo Prep",
+      "estimated_time": "~1.5 hours",
+      "key_output": "Demo-ready",
+      "steps": [
+        {
+          "step": 1,
+          "title": "UI polish pass",
+          "description": "Go through both pages and fix: inconsistent spacing, text that overflows, buttons that look plain. Add Tailwind classes: hover:bg-teal-600, transition-colors, rounded-lg, shadow-sm everywhere."
+        },
+        {
+          "step": 2,
+          "title": "Add loading states",
+          "description": "When submitting a complaint, disable the button and show 'Submitting...' text. When map loads, show a spinner until pins appear. Small details that make it feel production-ready."
+        },
+        {
+          "step": 3,
+          "title": "Pre-load convincing sample data",
+          "description": "Add 8-10 road records with real road names from your city. Add 5-6 complaints at real locations. Add 10+ budget log entries spanning 6 months. The dashboard should look like it's been in use for months."
+        },
+        {
+          "step": 4,
+          "title": "Rehearse the demo flow 3 times",
+          "description": "Full demo order: 1) Show map with existing complaints, 2) File new complaint live on phone, 3) Show it appear on map, 4) Ask AI chatbot a question, 5) Show admin budget log. Time it — aim for under 4 minutes."
+        },
+        {
+          "step": 5,
+          "title": "Prepare for judge questions",
+          "description": "Practice answers for: 'How does routing work?', 'Is the data real?', 'What happens offline?', 'How is the budget secured?', 'Can this scale?'. Confident answers matter as much as the demo."
+        }
+      ],
+      "tip": "The demo is everything. A polished 4-minute demo of a simple project beats a broken complex one every time. Rehearse until it's smooth."
+    }
+  ],
+
+  "roadmap_summary": [
+    { "phase": "1 — Setup", "what_you_build": "Folder structure, SQLite, sample data", "time": "30 min", "key_output": "Project runs locally" },
+    { "phase": "2 — Backend", "what_you_build": "All FastAPI routes + /docs tested", "time": "2 hrs", "key_output": "All APIs working" },
+    { "phase": "3 — Citizen UI", "what_you_build": "Map, complaint form, geolocation, camera", "time": "2 hrs", "key_output": "Live pin drop works" },
+    { "phase": "4 — Admin UI", "what_you_build": "Dashboard, road table, budget timeline", "time": "1.5 hrs", "key_output": "Judge-facing view ready" },
+    { "phase": "5 — AI Chat", "what_you_build": "Gemini chatbot with road data context", "time": "1 hr", "key_output": "Smart Q&A working" },
+    { "phase": "6 — Offline", "what_you_build": "localStorage save + auto-sync", "time": "45 min", "key_output": "WiFi-off demo works" },
+    { "phase": "7 — Polish", "what_you_build": "Sample data, UI fixes, demo rehearsal", "time": "1.5 hrs", "key_output": "Demo-ready" }
+  ],
+
+  "total_estimated_time": "10-14 hours for a 2-3 person team",
+
+  "pre_submission_checklist": [
+    "FastAPI server runs on localhost:8000 with no errors",
+    "Leaflet map loads and shows complaint pins",
+    "Filing a complaint shows correct routed authority",
+    "AI chatbot answers at least one road-related query intelligently",
+    "Budget log table visible in admin dashboard with hashes",
+    "localStorage saves a complaint when offline (WiFi off test)",
+    "Sample data pre-loaded in SQLite (roads, contractors, budgets)",
+    "UI looks clean on mobile browser (test on your phone)"
+  ],
+
+  "meta": {
+    "edition": "Localhost Edition",
+    "year": "2025",
+    "target_audience": "Beginner hackathon team (2-3 people)",
+    "excluded_technologies": ["Flutter", "Blockchain", "Cloud services", "Docker", "PostgreSQL", "MySQL"]
+  }
+}

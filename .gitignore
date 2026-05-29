@@ -1,0 +1,12 @@
+.env
+roadwatch.db
+static/uploads/
+__pycache__/
+*.pyc
+.graphrepo/
+.ven/
+.mcp.json
+.repomixignore
+repomix-output.json
+repomix.config.json
+.vscode/
